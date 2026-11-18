@@ -2,102 +2,120 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Обязательный мета-тег для корректной работы на мобильных устройствах и учета "челки" -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Copy AL | Pro Trading</title>
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- React & Babel -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Сброс стилей и настройка на полный экран */
-        html, body { 
-            margin: 0; 
-            padding: 0; 
-            height: 100%; 
-            background-color: #09090b; 
-            font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Запрещаем скролл всего body */
-            -webkit-tap-highlight-color: transparent;
-        }
-        #root { 
-            height: 100dvh; /* Динамическая высота экрана (лучше чем 100vh) */
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        /* Кастомный скролл */
+        html, body { margin: 0; padding: 0; height: 100%; background-color: #09090b; font-family: 'Inter', sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        #root { height: 100dvh; width: 100%; display: flex; flex-direction: column; }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
 
-        /* Анимации */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.92); } 100% { opacity: 1; transform: scale(1); } }
         @keyframes pulseGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @keyframes blink { 50% { opacity: 0; } }
         @keyframes showBtn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+        @keyframes rotateGradient { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-9px); }
+            40% { transform: translateX(9px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 123, 107, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 123, 107, 0); }
+        }
+        @keyframes successPop {
+            0% { transform: scale(0.6); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes drawCheck {
+            from { stroke-dashoffset: 100; }
+            to { stroke-dashoffset: 0; }
+        }
+
         .anim-fade { animation: fadeIn 0.4s ease-out forwards; }
         .anim-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .anim-pop { animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
         .progress-bar { transition: width 1s linear; }
 
-        .otc-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 123, 107, 0.9);
-            color: #000;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 6px;
-            z-index: 10;
-            letter-spacing: 0.5px;
-            pointer-events: none;
-        }
-
-        .cursor-blink::after {
-            content: '|';
-            animation: blink 1s step-end infinite;
-            color: white;
-        }
-
+        .otc-badge { position: absolute; top: 10px; right: 10px; background: rgba(255, 123, 107, 0.9); color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; z-index: 10; letter-spacing: 0.5px; pointer-events: none; }
+        .cursor-blink::after { content: '|'; animation: blink 1s step-end infinite; color: white; }
         .delay-btn { opacity: 0; animation: showBtn 0.5s ease-out 3.5s forwards; }
-
-        .chart-canvas {
-            width: 100%;
-            height: 200px;
-            display: block;
-            background: #121214;
-        }
-
-        /* Безопасные зоны для мобильных устройств */
+        .chart-canvas { width: 100%; height: 170px; display: block; background: #121214; }
         .safe-top { padding-top: max(1.5rem, env(safe-area-inset-top)); }
         .safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+
+        /* Verify modal */
+        .verify-card { position: relative; border-radius: 28px; padding: 2px; overflow: hidden; }
+        .verify-card::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: conic-gradient(from 0deg, transparent 0deg, #FF7B6B 60deg, transparent 120deg, transparent 180deg, #4285F4 240deg, transparent 300deg, transparent 360deg);
+            animation: rotateGradient 4s linear infinite;
+        }
+        .verify-card-inner {
+            position: relative;
+            border-radius: 26px;
+            background: linear-gradient(180deg, #131316 0%, #0c0c0e 100%);
+            z-index: 1;
+        }
+        .verify-card.error .verify-card-inner { animation: shake 0.4s ease-in-out; }
+        .otp-input {
+            background: #0a0a0c;
+            border: 1.5px solid #27272a;
+            border-radius: 14px;
+            color: white;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            width: 100%;
+            aspect-ratio: 1 / 1.15;
+            outline: none;
+            transition: all 0.2s ease;
+            caret-color: #FF7B6B;
+        }
+        .otp-input:focus {
+            border-color: #FF7B6B;
+            box-shadow: 0 0 0 3px rgba(255, 123, 107, 0.15);
+            background: #111114;
+        }
+        .otp-input.filled {
+            border-color: rgba(255, 123, 107, 0.4);
+            background: rgba(255, 123, 107, 0.06);
+        }
+        .otp-input.success {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .otp-input.errored {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, memo } = React;
 
-        // --- ЛОКАЛИЗАЦИЯ ---
         const TRANSLATIONS = {
             ru: {
                 welcomeTitle: "Добро пожаловать в будущее трейдинга.",
@@ -106,20 +124,31 @@
                 selectLang: "Выберите язык",
                 home: "ГЛАВНАЯ",
                 chat: "AI ЧАТ",
-                analysisComplete: "Анализ завершен. Приоритетный сигнал —",
                 confidence: "Уверенность",
                 marketStructure: "Структура рынка",
                 confirmation: "Подтверждение",
-                getNewSignal: "Новый сигнал",
-                waitSignal: "Ожидание сигнала",
                 analyzing: "Сканирование графика",
                 until: "до",
                 left: "осталось",
                 dashboard: "Дашборд",
                 balance: "Баланс счета",
                 recentSignals: "Последние сигналы",
-                win: "Профит",
-                loss: "Убыток"
+                expired: "Истёк",
+                chatHint: "Выберите инструмент, рынок и экспирацию — затем нажмите отправить.",
+                clearChat: "Очистить чат",
+                toSignals: "Перейти к AI сигналам",
+                // Verify modal
+                verifyTitle: "Верификация доступа",
+                verifySubtitle: "Введите код подтверждения, чтобы получить AI-сигнал",
+                verifyBtn: "Подтвердить",
+                verifyChecking: "Проверка...",
+                verifyCheckingMsg: "Проверка кода...",
+                verifySuccessTitle: "Доступ разрешён",
+                verifySuccessSub: "Код подтверждён. Получаем сигнал...",
+                verifyErrorTitle: "Неверный код",
+                verifyErrorSub: "Проверьте код и попробуйте снова",
+                verifyCancel: "Отмена",
+                verifySecured: "Защищено · Copy AL Security"
             },
             en: {
                 welcomeTitle: "Welcome to the future of trading.",
@@ -128,24 +157,35 @@
                 selectLang: "Select Language",
                 home: "HOME",
                 chat: "AI CHAT",
-                analysisComplete: "Analysis complete. Priority signal —",
                 confidence: "Confidence",
                 marketStructure: "Market structure",
                 confirmation: "Confirmation",
-                getNewSignal: "New signal",
-                waitSignal: "Wait for the signal",
                 analyzing: "Scanning chart",
                 until: "until",
                 left: "left",
                 dashboard: "Dashboard",
                 balance: "Account Balance",
                 recentSignals: "Recent Signals",
-                win: "Win",
-                loss: "Loss"
+                expired: "Expired",
+                chatHint: "Set the instrument, market and expiration — then tap send to get a signal.",
+                clearChat: "Clear chat",
+                toSignals: "Go to AI signals",
+                verifyTitle: "Access Verification",
+                verifySubtitle: "Enter the confirmation code to receive an AI signal",
+                verifyBtn: "Confirm",
+                verifyChecking: "Checking...",
+                verifyCheckingMsg: "Verifying code...",
+                verifySuccessTitle: "Access granted",
+                verifySuccessSub: "Code confirmed. Generating signal...",
+                verifyErrorTitle: "Invalid code",
+                verifyErrorSub: "Check the code and try again",
+                verifyCancel: "Cancel",
+                verifySecured: "Secured · Copy AL Security"
             }
         };
 
-        // --- ИКОНКИ ---
+        const SECRET_CODE = "23912";
+
         const Icon = ({ path, size = 20, stroke = 2, fill = "none" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round">{path}</svg>
         );
@@ -153,23 +193,47 @@
             Globe: () => <Icon path={<><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>} size={18} />,
             Chat: () => <Icon path={<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>} size={18} />,
             Home: () => <Icon path={<><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>} />,
-            Send: () => <Icon path={<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>} />,
+            Send: () => <Icon path={<><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></>} size={16} />,
             Refresh: () => <Icon path={<><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></>} size={18} />,
-            TrendUp: () => <Icon path={<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>} size={24} />,
-            TrendDown: () => <Icon path={<><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></>} size={24} />,
+            TrendUp: () => <Icon path={<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>} size={20} />,
+            TrendDown: () => <Icon path={<><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></>} size={20} />,
             Lock: () => <Icon path={<><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>} size={14} />,
             Chevron: () => <Icon path={<polyline points="6 9 12 15 18 9"/>} size={14} />,
             Check: () => <Icon path={<polyline points="20 6 9 17 4 12"/>} size={14} />,
-            Sparkles: () => <Icon path={<><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></>} size={32} />,
+            Sparkles: ({ size = 32 }) => <Icon path={<><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></>} size={size} />,
             Wallet: () => <Icon path={<><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></>} size={20} />,
-            Activity: () => <Icon path={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>} size={20} />
+            Activity: () => <Icon path={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>} size={20} />,
+            Trash: () => <Icon path={<><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></>} size={16} />,
+            X: () => <Icon path={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>} size={18} />,
+            Shield: ({ size = 24 }) => <Icon path={<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></>} size={size} />
         };
 
-        // --- ДАННЫЕ ---
+        // --- AI MODEL ICONS (SVG) ---
+        const ClaudeIcon = ({ size = 24, color = "currentColor" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round">
+                <line x1="12" y1="3" x2="12" y2="21" />
+                <line x1="4" y1="7.5" x2="20" y2="16.5" />
+                <line x1="4" y1="16.5" x2="20" y2="7.5" />
+            </svg>
+        );
+        const GptIcon = ({ size = 24, color = "currentColor" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round">
+                <ellipse cx="12" cy="12" rx="9.5" ry="4" />
+                <ellipse cx="12" cy="12" rx="9.5" ry="4" transform="rotate(60 12 12)" />
+                <ellipse cx="12" cy="12" rx="9.5" ry="4" transform="rotate(120 12 12)" />
+                <circle cx="12" cy="12" r="1.4" fill={color} stroke="none" />
+            </svg>
+        );
+        const GeminiIcon = ({ size = 24, color = "currentColor" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+                <path d="M12 2c.3 0 .55.2.63.5.5 2.8 1.5 4.8 3.3 6.6 1.8 1.8 3.8 2.8 6.6 3.3.3.08.5.33.5.63s-.2.55-.5.63c-2.8.5-4.8 1.5-6.6 3.3-1.8 1.8-2.8 3.8-3.3 6.6-.08.3-.33.5-.63.5s-.55-.2-.63-.5c-.5-2.8-1.5-4.8-3.3-6.6-1.8-1.8-3.8-2.8-6.6-3.3-.3-.08-.5-.33-.5-.63s.2-.55.5-.63c2.8-.5 4.8-1.5 6.6-3.3 1.8-1.8 2.8-3.8 3.3-6.6.08-.3.33-.5.63-.5z"/>
+            </svg>
+        );
+
         const AI_MODELS = [
-            { id: 'claude', name: 'Claude Sonnet 5', hex: '#FF7B6B', icon: '✳️' },
-            { id: 'gpt', name: 'GPT-5 mini', hex: '#10a37f', icon: '🤖' },
-            { id: 'gemini', name: 'Gemini Pro', hex: '#4285F4', icon: '✨' }
+            { id: 'claude', name: 'Claude Sonnet 5', hex: '#FF7B6B', Icon: ClaudeIcon },
+            { id: 'gpt', name: 'GPT-5 mini', hex: '#10a37f', Icon: GptIcon },
+            { id: 'gemini', name: 'Gemini Pro', hex: '#4285F4', Icon: GeminiIcon }
         ];
 
         const FOREX_PAIRS = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD', 'USD/CHF', 'NZD/USD', 'EUR/GBP', 'EUR/JPY', 'GBP/JPY', 'AUD/JPY', 'EUR/AUD', 'EUR/CAD', 'GBP/AUD', 'USD/MXN', 'USD/ZAR', 'USD/TRY', 'USD/SEK', 'USD/NOK', 'USD/DKK'];
@@ -177,15 +241,197 @@
         const CRYPTO_PAIRS = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'XRP/USD'];
         const ALL_ASSETS = [...FOREX_PAIRS, ...CRYPTO_PAIRS, ...OTC_PAIRS];
         const TIMEFRAMES = ['5s', '15s', '30s', '1m', '5m'];
-
         const getSeconds = (tf) => tf.includes('m') ? parseInt(tf) * 60 : parseInt(tf);
 
-        // --- КОМПОНЕНТЫ ---
+        // ============ VERIFY MODAL ============
+        const VerifyModal = ({ open, onClose, onSuccess, t, aiModel }) => {
+            const [digits, setDigits] = useState(['', '', '', '', '']);
+            const [status, setStatus] = useState('idle'); // idle | checking | success | error
+            const inputsRef = useRef([]);
+            const CurrentIcon = aiModel.Icon;
 
+            useEffect(() => {
+                if (open) {
+                    setDigits(['', '', '', '', '']);
+                    setStatus('idle');
+                    setTimeout(() => inputsRef.current[0]?.focus(), 250);
+                }
+            }, [open]);
+
+            if (!open) return null;
+
+            const code = digits.join('');
+
+            const handleChange = (idx, val) => {
+                if (status === 'checking' || status === 'success') return;
+                const digit = val.replace(/\D/g, '').slice(-1);
+                const next = [...digits];
+                next[idx] = digit;
+                setDigits(next);
+                if (digit && idx < 4) inputsRef.current[idx + 1]?.focus();
+                if (status === 'error') setStatus('idle');
+            };
+
+            const handleKeyDown = (idx, e) => {
+                if (status === 'checking' || status === 'success') return;
+                if (e.key === 'Backspace' && !digits[idx] && idx > 0) {
+                    inputsRef.current[idx - 1]?.focus();
+                }
+                if (e.key === 'ArrowLeft' && idx > 0) inputsRef.current[idx - 1]?.focus();
+                if (e.key === 'ArrowRight' && idx < 4) inputsRef.current[idx + 1]?.focus();
+                if (e.key === 'Enter' && code.length === 5) submit();
+            };
+
+            const handlePaste = (e) => {
+                e.preventDefault();
+                if (status === 'checking' || status === 'success') return;
+                const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 5);
+                if (!text) return;
+                const next = ['', '', '', '', ''];
+                for (let i = 0; i < text.length; i++) next[i] = text[i];
+                setDigits(next);
+                const focusIdx = Math.min(text.length, 4);
+                inputsRef.current[focusIdx]?.focus();
+            };
+
+            const submit = () => {
+                if (code.length !== 5 || status === 'checking' || status === 'success') return;
+                setStatus('checking');
+                setTimeout(() => {
+                    if (code === SECRET_CODE) {
+                        setStatus('success');
+                        setTimeout(() => {
+                            onSuccess();
+                        }, 900);
+                    } else {
+                        setStatus('error');
+                        setDigits(['', '', '', '', '']);
+                        setTimeout(() => inputsRef.current[0]?.focus(), 400);
+                    }
+                }, 850);
+            };
+
+            const cardClass =
+                status === 'error' ? 'verify-card error' :
+                status === 'success' ? 'verify-card success' :
+                'verify-card';
+
+            return (
+                <div
+                    className="fixed inset-0 z-[300] flex items-center justify-center p-5 anim-fade"
+                    style={{ background: 'radial-gradient(ellipse at center, rgba(9,9,11,0.85) 0%, rgba(0,0,0,0.95) 100%)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}
+                    onClick={status === 'checking' || status === 'success' ? undefined : onClose}
+                >
+                    <div
+                        className={`${cardClass} w-full max-w-[380px] anim-pop`}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="verify-card-inner p-6">
+                            {/* Close */}
+                            {status !== 'success' && (
+                                <button
+                                    onClick={onClose}
+                                    className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-all z-10"
+                                    disabled={status === 'checking'}
+                                >
+                                    <Icons.X />
+                                </button>
+                            )}
+
+                            {/* Header icon */}
+                            <div className="flex justify-center mb-4">
+                                <div
+                                    className="relative w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-500"
+                                    style={{
+                                        backgroundColor: status === 'success' ? 'rgba(16,185,129,0.15)' : status === 'error' ? 'rgba(239,68,68,0.15)' : `${aiModel.hex}15`,
+                                        borderColor: status === 'success' ? 'rgba(16,185,129,0.5)' : status === 'error' ? 'rgba(239,68,68,0.5)' : `${aiModel.hex}55`,
+                                        animation: status === 'idle' ? 'glowPulse 2.5s ease-in-out infinite' : 'none'
+                                    }}
+                                >
+                                    {status === 'success' ? (
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'successPop 0.5s ease-out' }}>
+                                            <polyline points="20 6 9 17 4 12" style={{ strokeDasharray: 100, strokeDashoffset: 100, animation: 'drawCheck 0.5s ease-out 0.1s forwards' }} />
+                                        </svg>
+                                    ) : status === 'error' ? (
+                                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    ) : (
+                                        <Icons.Shield size={28} />
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Title */}
+                            <h2 className="text-center text-white font-bold text-[19px] mb-1.5 tracking-tight">
+                                {status === 'success' ? t.verifySuccessTitle :
+                                 status === 'error' ? t.verifyErrorTitle :
+                                 t.verifyTitle}
+                            </h2>
+                            <p className="text-center text-[12px] text-gray-400 leading-relaxed mb-6 max-w-[280px] mx-auto">
+                                {status === 'success' ? t.verifySuccessSub :
+                                 status === 'error' ? t.verifyErrorSub :
+                                 t.verifySubtitle}
+                            </p>
+
+                            {/* OTP Inputs */}
+                            <div className="flex gap-2 mb-6" style={{ padding: '0 4px' }}>
+                                {digits.map((d, i) => (
+                                    <input
+                                        key={i}
+                                        ref={el => inputsRef.current[i] = el}
+                                        type="tel"
+                                        inputMode="numeric"
+                                        maxLength={1}
+                                        value={d}
+                                        onChange={e => handleChange(i, e.target.value)}
+                                        onKeyDown={e => handleKeyDown(i, e)}
+                                        onPaste={handlePaste}
+                                        onFocus={e => e.target.select()}
+                                        disabled={status === 'checking' || status === 'success'}
+                                        className={`otp-input ${d ? 'filled' : ''} ${status === 'success' ? 'success' : ''} ${status === 'error' ? 'errored' : ''}`}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Submit button */}
+                            <button
+                                onClick={submit}
+                                disabled={code.length !== 5 || status === 'checking' || status === 'success'}
+                                className="w-full py-3.5 rounded-2xl font-bold text-[14px] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                style={{
+                                    backgroundColor: status === 'success' ? '#10b981' : code.length === 5 && status !== 'checking' ? 'white' : '#1c1c1f',
+                                    color: status === 'success' ? 'white' : code.length === 5 && status !== 'checking' ? 'black' : '#52525b',
+                                    cursor: code.length !== 5 || status === 'checking' || status === 'success' ? 'not-allowed' : 'pointer',
+                                    boxShadow: code.length === 5 && status === 'idle' ? '0 8px 24px rgba(255,255,255,0.12)' : 'none'
+                                }}
+                            >
+                                {status === 'checking' ? (
+                                    <><div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> {t.verifyChecking}</>
+                                ) : status === 'success' ? (
+                                    <><Icons.Check /> {t.verifySuccessTitle}</>
+                                ) : (
+                                    <>
+                                        <Icons.Lock /> {t.verifyBtn}
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Footer */}
+                            <div className="flex items-center justify-center gap-1.5 mt-4 text-[10px] text-gray-600">
+                                <Icons.Shield size={10} />
+                                <span>{t.verifySecured}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============ OTHER COMPONENTS ============
         const Typewriter = ({ text, delay = 40 }) => {
             const [currentText, setCurrentText] = useState('');
             const [isDone, setIsDone] = useState(false);
-
             useEffect(() => {
                 let i = 0;
                 setCurrentText('');
@@ -193,45 +439,30 @@
                 const timer = setInterval(() => {
                     setCurrentText(text.substring(0, i));
                     i++;
-                    if (i > text.length) {
-                        clearInterval(timer);
-                        setIsDone(true);
-                    }
+                    if (i > text.length) { clearInterval(timer); setIsDone(true); }
                 }, delay);
                 return () => clearInterval(timer);
             }, [text, delay]);
-
             return <span className={!isDone ? 'cursor-blink' : ''}>{currentText}</span>;
         };
 
-        const CanvasChart = ({ symbol, isOtc }) => {
+        const CanvasChart = memo(({ symbol, isOtc }) => {
             const canvasRef = useRef(null);
-            
             useEffect(() => {
                 const canvas = canvasRef.current;
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
-                
-                const width = canvas.width = canvas.offsetWidth * 2; 
+                const width = canvas.width = canvas.offsetWidth * 2;
                 const height = canvas.height = canvas.offsetHeight * 2;
                 ctx.scale(2, 2);
-                
-                const w = width / 2;
-                const h = height / 2;
-                
+                const w = width / 2, h = height / 2;
                 let seed = 0;
                 for (let i = 0; i < symbol.length; i++) seed += symbol.charCodeAt(i);
-                
-                const random = () => {
-                    const x = Math.sin(seed++) * 10000;
-                    return x - Math.floor(x);
-                };
-                
+                const random = () => { const x = Math.sin(seed++) * 10000; return x - Math.floor(x); };
                 const candles = [];
                 let price = 1.0 + random() * 0.5;
                 const numCandles = 40;
                 const candleWidth = w / numCandles - 2;
-                
                 for (let i = 0; i < numCandles; i++) {
                     const open = price;
                     const volatility = 0.01 + random() * 0.03;
@@ -241,83 +472,61 @@
                     price = close;
                     candles.push({ open, close, high, low });
                 }
-                
                 const allHighs = candles.map(c => c.high);
                 const allLows = candles.map(c => c.low);
                 const maxPrice = Math.max(...allHighs);
                 const minPrice = Math.min(...allLows);
                 const range = maxPrice - minPrice || 1;
                 const padding = 20;
-                
                 const scaleY = (val) => h - padding - ((val - minPrice) / range) * (h - padding * 2);
-                
                 ctx.clearRect(0, 0, w, h);
-                
-                ctx.strokeStyle = '#27272a';
-                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = '#27272a'; ctx.lineWidth = 0.5;
                 for (let i = 0; i < 5; i++) {
                     const y = padding + (i / 4) * (h - padding * 2);
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(w, y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
                 }
-                
                 candles.forEach((c, i) => {
                     const x = i * (candleWidth + 2) + 2;
-                    const yHigh = scaleY(c.high);
-                    const yLow = scaleY(c.low);
-                    const yOpen = scaleY(c.open);
-                    const yClose = scaleY(c.close);
-                    
+                    const yHigh = scaleY(c.high), yLow = scaleY(c.low);
+                    const yOpen = scaleY(c.open), yClose = scaleY(c.close);
                     const isGreen = c.close > c.open;
                     ctx.fillStyle = isGreen ? '#10a37f' : '#ef4444';
                     ctx.strokeStyle = isGreen ? '#10a37f' : '#ef4444';
-                    
                     ctx.beginPath();
                     ctx.moveTo(x + candleWidth / 2, yHigh);
                     ctx.lineTo(x + candleWidth / 2, yLow);
                     ctx.stroke();
-                    
                     const bodyHeight = Math.max(1, Math.abs(yClose - yOpen));
                     const bodyY = Math.min(yOpen, yClose);
                     ctx.fillRect(x, bodyY, candleWidth, bodyHeight);
                 });
-                
                 const lastCandle = candles[candles.length - 1];
                 const lastY = scaleY(lastCandle.close);
                 ctx.strokeStyle = '#FF7B6B';
                 ctx.setLineDash([4, 4]);
                 ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(0, lastY);
-                ctx.lineTo(w, lastY);
-                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, lastY); ctx.lineTo(w, lastY); ctx.stroke();
                 ctx.setLineDash([]);
-                
             }, [symbol, isOtc]);
-
             return (
-                <div className="relative w-full rounded-[20px] overflow-hidden border border-[#27272a] bg-[#121214] anim-slide-up" style={{ animationDelay: '0.1s' }}>
+                <div className="relative w-full rounded-[20px] overflow-hidden border border-[#27272a] bg-[#121214]">
                     {isOtc && <div className="otc-badge">OTC</div>}
                     <canvas ref={canvasRef} className="chart-canvas" />
                 </div>
             );
-        };
+        });
 
         const CustomSelect = ({ value, options, onChange, icon, align = 'left', openUp = false }) => {
             const [isOpen, setIsOpen] = useState(false);
             const ref = useRef(null);
-
             useEffect(() => {
                 const handleClickOutside = (e) => { if (ref.current && !ref.current.contains(e.target)) setIsOpen(false); };
                 document.addEventListener('mousedown', handleClickOutside);
                 return () => document.removeEventListener('mousedown', handleClickOutside);
             }, []);
-
             return (
                 <div className="relative flex-1" ref={ref}>
-                    <button 
+                    <button
                         onClick={() => setIsOpen(!isOpen)}
                         className={`w-full flex items-center justify-between bg-[#121214] hover:bg-[#1c1c1f] border border-[#27272a] rounded-2xl py-2.5 px-3 text-xs font-medium text-gray-200 transition-all duration-200 ${isOpen ? 'ring-1 ring-[#27272a]' : ''}`}
                     >
@@ -325,11 +534,8 @@
                             {icon && <span className="shrink-0">{icon}</span>}
                             <span className="truncate">{value}</span>
                         </div>
-                        <div className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                            <Icons.Chevron />
-                        </div>
+                        <div className={`text-gray-400 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}><Icons.Chevron /></div>
                     </button>
-
                     {isOpen && (
                         <div className={`absolute z-[100] w-full bg-[#121214] border border-[#27272a] rounded-2xl shadow-2xl overflow-hidden anim-fade ${openUp ? 'bottom-full mb-2' : 'top-full mt-2'} ${align === 'right' ? 'right-0' : 'left-0'}`}>
                             <div className="max-h-48 overflow-y-auto custom-scroll p-1">
@@ -339,8 +545,8 @@
                                         onClick={() => { onChange(opt); setIsOpen(false); }}
                                         className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center justify-between hover:bg-[#1c1c1f] transition-colors ${value === opt ? 'text-white font-semibold bg-[#1c1c1f]' : 'text-gray-400'}`}
                                     >
-                                        {opt}
-                                        {value === opt && <span className="text-white"><Icons.Check /></span>}
+                                        <span className="truncate">{opt}</span>
+                                        {value === opt && <span className="text-white shrink-0 ml-1"><Icons.Check /></span>}
                                     </button>
                                 ))}
                             </div>
@@ -350,44 +556,181 @@
             );
         };
 
-        // --- ОСНОВНОЕ ПРИЛОЖЕНИЕ ---
+        const ModelMiniSelect = ({ model, onChange }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const ref = useRef(null);
+            const ModelIcon = model.Icon;
+            useEffect(() => {
+                const handle = (e) => { if (ref.current && !ref.current.contains(e.target)) setIsOpen(false); };
+                document.addEventListener('mousedown', handle);
+                return () => document.removeEventListener('mousedown', handle);
+            }, []);
+            return (
+                <div className="relative shrink-0" ref={ref}>
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-11 h-11 rounded-full flex items-center justify-center border transition-all hover:scale-105 active:scale-95"
+                        style={{ backgroundColor: `${model.hex}15`, borderColor: `${model.hex}40` }}
+                        title={model.name}
+                    >
+                        <ModelIcon size={20} color={model.hex} />
+                    </button>
+                    {isOpen && (
+                        <div className="absolute bottom-full mb-2 left-0 w-52 bg-[#121214] border border-[#27272a] rounded-2xl shadow-2xl overflow-hidden anim-fade z-[100]">
+                            <div className="p-1">
+                                {AI_MODELS.map(m => {
+                                    const MIcon = m.Icon;
+                                    return (
+                                        <button
+                                            key={m.id}
+                                            onClick={() => { onChange(m); setIsOpen(false); }}
+                                            className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center gap-2 hover:bg-[#1c1c1f] transition-colors ${model.id === m.id ? 'bg-[#1c1c1f] text-white font-semibold' : 'text-gray-400'}`}
+                                        >
+                                            <span className="w-5 h-5 flex items-center justify-center shrink-0">
+                                                <MIcon size={16} color={m.hex} />
+                                            </span>
+                                            <span className="truncate">{m.name}</span>
+                                            {model.id === m.id && <span className="ml-auto text-white"><Icons.Check /></span>}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const SignalMessage = ({ msg, now, t }) => {
+            const remaining = Math.max(0, Math.ceil((msg.expiresAt - now) / 1000));
+            const isExpired = remaining <= 0;
+            const progress = Math.max(0, Math.min(100, (remaining / msg.maxTime) * 100));
+            const isSell = msg.direction === 'SELL';
+            const AvatarIcon = msg.aiModel.Icon;
+            return (
+                <div className="mb-4 anim-slide-up">
+                    <div className="flex items-center gap-2 mb-2 text-[10px] text-gray-500">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${msg.aiModel.hex}22` }}>
+                            <AvatarIcon size={12} color={msg.aiModel.hex} />
+                        </div>
+                        <span className="font-semibold text-gray-400 truncate">{msg.aiModel.name}</span>
+                        <span>·</span>
+                        <span className="shrink-0">{new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span>
+                        {isExpired && <span className="ml-auto text-gray-600 shrink-0">{t.expired}</span>}
+                    </div>
+
+                    <div className={`rounded-[22px] p-4 border-2 ${isSell ? 'border-red-500/30 bg-gradient-to-b from-red-500/10 to-[#09090b]' : 'border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[#09090b]'} ${isExpired ? 'opacity-55' : ''}`}>
+                        <div className="flex justify-between items-center mb-3">
+                            <div className={`text-lg font-bold flex items-center gap-1.5 ${isSell ? 'text-red-400' : 'text-emerald-400'}`}>
+                                {isSell ? <Icons.TrendDown /> : <Icons.TrendUp />} {msg.direction}
+                            </div>
+                            <div className="flex flex-col items-end">
+                                <div className="flex items-center gap-1">
+                                    <span className="text-[9px] text-gray-400 uppercase tracking-wider">{t.confidence}</span>
+                                    <span className={`text-sm font-bold ${isSell ? 'text-red-400' : 'text-emerald-400'}`}>{msg.confidence}%</span>
+                                </div>
+                                <div className="w-16 h-1 bg-black/40 rounded-full mt-1 overflow-hidden">
+                                    <div className={`h-full ${isSell ? 'bg-red-400' : 'bg-emerald-400'}`} style={{width: `${msg.confidence}%`}}></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-1.5 mb-3">
+                            <span className="bg-black/30 px-2 py-1 rounded-lg text-[10px] font-medium border border-white/5 flex items-center gap-1">
+                                <span>🇪🇺</span> {msg.asset}
+                            </span>
+                            <span className="bg-black/30 px-2 py-1 rounded-lg text-[10px] font-medium border border-white/5">{msg.timeframe}</span>
+                        </div>
+
+                        <div className="space-y-2 mb-3">
+                            <div className="bg-black/20 p-2.5 rounded-xl border border-white/5">
+                                <p className="text-[9px] text-gray-400 uppercase tracking-wider mb-0.5 font-semibold">{t.marketStructure}</p>
+                                <p className="text-[11px] text-gray-200 leading-snug">{msg.structure}</p>
+                            </div>
+                            <div className="bg-black/20 p-2.5 rounded-xl border border-white/5">
+                                <p className="text-[9px] text-gray-400 uppercase tracking-wider mb-0.5 font-semibold">{t.confirmation}</p>
+                                <p className="text-[11px] text-gray-200 leading-snug">{msg.confirmation}</p>
+                            </div>
+                        </div>
+
+                        <div className="w-full bg-black/50 rounded-full h-1 overflow-hidden mb-1.5">
+                            <div className={`h-full ${isSell ? 'bg-red-500' : 'bg-emerald-500'} progress-bar`} style={{ width: `${progress}%` }} />
+                        </div>
+                        <div className="flex justify-between text-[10px] text-gray-500 font-medium">
+                            <span>{t.until} {new Date(msg.expiresAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span>
+                            <span className={isExpired ? 'text-gray-600' : 'text-gray-300'}>
+                                {isExpired ? t.expired : `${remaining}s ${t.left}`}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         function App() {
-            const [appState, setAppState] = useState('language'); 
+            const [appState, setAppState] = useState('language');
             const [lang, setLang] = useState('ru');
             const t = TRANSLATIONS[lang];
 
             const [activeTab, setActiveTab] = useState('chat');
-            
-            const [chatScreen, setChatScreen] = useState('generator');
+
             const [aiModel, setAiModel] = useState(AI_MODELS[0]);
             const [asset, setAsset] = useState('EUR/USD OTC');
             const [market, setMarket] = useState('OTC');
             const [timeframe, setTimeframe] = useState('5s');
-            
+
             const [isAnalyzing, setIsAnalyzing] = useState(false);
             const [analysisProgress, setAnalysisProgress] = useState(0);
             const [cooldown, setCooldown] = useState(0);
-            const [signal, setSignal] = useState(null);
-            const [timeLeft, setTimeLeft] = useState(0);
-            const [maxTime, setMaxTime] = useState(5);
 
+            const [messages, setMessages] = useState([]);
+            const [now, setNow] = useState(Date.now());
+
+            const [verifyOpen, setVerifyOpen] = useState(false);
+
+            const chatEndRef = useRef(null);
             const isOtcSelected = asset.includes('OTC');
+            const CurrentModelIcon = aiModel.Icon;
 
             useEffect(() => {
-                let timer;
-                if (cooldown > 0) {
-                    timer = setInterval(() => setCooldown(prev => prev - 1), 1000);
-                }
+                const timer = setInterval(() => setNow(Date.now()), 1000);
                 return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                if (cooldown > 0) {
+                    const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
+                    return () => clearTimeout(timer);
+                }
             }, [cooldown]);
 
+            useEffect(() => {
+                if (messages.length > 0 && chatEndRef.current) {
+                    chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, [messages.length]);
+
+            useEffect(() => {
+                if (activeTab === 'chat' && messages.length > 0 && chatEndRef.current) {
+                    chatEndRef.current.scrollIntoView({ block: 'end' });
+                }
+            }, [activeTab]);
+
+            useEffect(() => { setMarket(asset.includes('OTC') ? 'OTC' : 'Real'); }, [asset]);
+
+            // Opens verify modal
+            const requestSignal = () => {
+                if (isAnalyzing || cooldown > 0 || verifyOpen) return;
+                setVerifyOpen(true);
+            };
+
+            // Actual generation — called only after successful verification
             const generateSignal = () => {
+                setVerifyOpen(false);
                 if (isAnalyzing || cooldown > 0) return;
-                
                 setIsAnalyzing(true);
                 setAnalysisProgress(0);
-                
-                const duration = 2800; 
+                const duration = 2800;
                 const intervalTime = 50;
                 const steps = duration / intervalTime;
                 let currentStep = 0;
@@ -395,50 +738,40 @@
                 const progressInterval = setInterval(() => {
                     currentStep++;
                     setAnalysisProgress(Math.min((currentStep / steps) * 100, 100));
-                    
                     if (currentStep >= steps) {
                         clearInterval(progressInterval);
                         setIsAnalyzing(false);
-                        setCooldown(20); 
-                        
+                        setCooldown(20);
+
                         const isBuy = Math.random() > 0.45;
                         const seconds = getSeconds(timeframe);
-                        setSignal({
+                        const createdAt = Date.now();
+                        const newMsg = {
+                            id: createdAt + Math.random(),
                             direction: isBuy ? 'BUY' : 'SELL',
                             confidence: Math.floor(Math.random() * 12) + 87,
                             structure: isBuy ? 'Higher lows forming, bullish momentum building.' : 'Lower highs capping the move, bearish pressure.',
-                            confirmation: isBuy ? 'Buyers absorb the pullback at local support.' : 'Rejection from local resistance confirmed.'
-                        });
-                        
-                        setMaxTime(seconds);
-                        setTimeLeft(seconds);
-                        setChatScreen('result');
+                            confirmation: isBuy ? 'Buyers absorb the pullback at local support.' : 'Rejection from local resistance confirmed.',
+                            asset, market, timeframe,
+                            aiModel,
+                            createdAt,
+                            expiresAt: createdAt + seconds * 1000,
+                            maxTime: seconds
+                        };
+                        setMessages(prev => [...prev, newMsg]);
                     }
                 }, intervalTime);
             };
 
-            useEffect(() => {
-                let timer;
-                if (chatScreen === 'result' && timeLeft > 0) {
-                    timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-                }
-                return () => clearInterval(timer);
-            }, [chatScreen, timeLeft > 0]);
-
-            const resetToGenerator = () => {
-                setChatScreen('generator');
-                setSignal(null);
-                setTimeLeft(0);
+            const clearChat = () => {
+                if (messages.length === 0) return;
+                setMessages([]);
             };
-
-            useEffect(() => {
-                setMarket(asset.includes('OTC') ? 'OTC' : 'Real');
-            }, [asset]);
 
             return (
                 <div className="w-full h-full bg-[#09090b] flex flex-col relative overflow-hidden text-white font-sans">
-                    
-                    {/* ЭКРАН ВЫБОРА ЯЗЫКА */}
+
+                    {/* LANGUAGE */}
                     {appState === 'language' && (
                         <div className="absolute inset-0 bg-[#09090b] z-[200] flex flex-col items-center justify-center p-8 anim-fade">
                             <Icons.Sparkles />
@@ -451,7 +784,7 @@
                         </div>
                     )}
 
-                    {/* ЭКРАН ПРИВЕТСТВИЯ */}
+                    {/* WELCOME */}
                     {appState === 'welcome' && (
                         <div className="absolute inset-0 bg-[#09090b] z-[200] flex flex-col justify-center p-6 sm:p-8 anim-fade">
                             <div className="mb-8">
@@ -465,7 +798,6 @@
                                     <Typewriter text={t.welcomeSubtitle} delay={25} />
                                 </p>
                             </div>
-                            
                             <div className="mt-auto safe-bottom">
                                 <button onClick={() => setAppState('main')} className="delay-btn w-full py-4 rounded-2xl bg-white text-black font-bold text-sm hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg shadow-white/10">
                                     {t.btnStart}
@@ -474,224 +806,164 @@
                         </div>
                     )}
 
-                    {/* ОСНОВНОЙ ИНТЕРФЕЙС */}
+                    {/* MAIN */}
                     {appState === 'main' && (
                         <>
-                            {/* ХЕДЕР (Безопасная зона сверху) */}
                             <div className="flex justify-between items-center px-6 safe-top pb-2 z-30 shrink-0 bg-[#09090b]">
                                 <div className="flex items-center gap-1.5">
                                     <span className="font-bold text-xl tracking-tight text-white">Copy AL</span>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 items-center">
+                                    {activeTab === 'chat' && messages.length > 0 && (
+                                        <button
+                                            onClick={clearChat}
+                                            title={t.clearChat}
+                                            className="p-2 bg-[#121214] rounded-full text-gray-300 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                        >
+                                            <Icons.Trash />
+                                        </button>
+                                    )}
                                     <button className="p-2 bg-[#121214] rounded-full text-gray-300 hover:text-white transition-colors"><Icons.Globe /></button>
                                     <button className="p-2 bg-[#121214] rounded-full text-gray-300 hover:text-white transition-colors"><Icons.Chat /></button>
                                 </div>
                             </div>
 
-                            {/* СКРОЛЛ-КОНТЕНТ (flex-1 заставляет занимать все свободное место) */}
-                            <div className="flex-1 overflow-y-auto px-5 py-2 custom-scroll">
-                                
-                                {/* --- ВКЛАДКА ГЛАВНАЯ --- */}
+                            <div className="flex-1 overflow-hidden flex flex-col">
+
+                                {/* HOME TAB */}
                                 {activeTab === 'home' && (
-                                    <div className="flex flex-col gap-5 anim-fade pb-4">
-                                        <div className="flex items-center gap-2 text-gray-400 text-sm mb-2 mt-2">
-                                            <Icons.Activity /> {t.dashboard}
-                                        </div>
+                                    <div className="flex-1 overflow-y-auto px-5 py-2 custom-scroll">
+                                        <div className="flex flex-col gap-5 anim-fade pb-4">
+                                            <div className="flex items-center gap-2 text-gray-400 text-sm mb-2 mt-2">
+                                                <Icons.Activity /> {t.dashboard}
+                                            </div>
+                                            <div className="w-full bg-gradient-to-br from-[#1c1c1f] to-[#121214] border border-[#27272a] rounded-[28px] p-6 anim-slide-up relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#10a37f]/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                                                <div className="flex items-center gap-2 text-gray-400 text-xs mb-2 font-medium">
+                                                    <Icons.Wallet /> {t.balance}
+                                                </div>
+                                                <div className="text-4xl font-bold text-white mb-4 tracking-tight">$ 12,450.00</div>
+                                                <div className="flex gap-3">
+                                                    <div className="bg-[#10a37f]/10 border border-[#10a37f]/20 rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-[#10a37f] text-xs font-semibold">
+                                                        <Icons.TrendUp /> +$ 340.50 (2.8%)
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                        <div className="w-full bg-gradient-to-br from-[#1c1c1f] to-[#121214] border border-[#27272a] rounded-[28px] p-6 anim-slide-up relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#10a37f]/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                                            <div className="flex items-center gap-2 text-gray-400 text-xs mb-2 font-medium">
-                                                <Icons.Wallet /> {t.balance}
-                                            </div>
-                                            <div className="text-4xl font-bold text-white mb-4 tracking-tight">$ 12,450.00</div>
-                                            <div className="flex gap-3">
-                                                <div className="bg-[#10a37f]/10 border border-[#10a37f]/20 rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-[#10a37f] text-xs font-semibold">
-                                                    <Icons.TrendUp /> +$ 340.50 (2.8%)
+                                            <div className="anim-slide-up" style={{animationDelay: '0.1s'}}>
+                                                <div className="text-sm font-semibold text-white mb-3 flex justify-between items-center">
+                                                    {t.recentSignals}
+                                                    <span className="text-[10px] text-gray-500 font-normal border border-[#27272a] px-2 py-0.5 rounded-full">All time</span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="bg-[#121214] border border-[#27272a] p-3 rounded-2xl flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]"><Icons.TrendUp /></div>
+                                                            <div>
+                                                                <div className="text-white text-sm font-bold">GBP/USD</div>
+                                                                <div className="text-[10px] text-gray-500">BUY · 15s</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-[#10a37f] font-bold text-sm">+$ 120.00</div>
+                                                    </div>
+                                                    <div className="bg-[#121214] border border-[#27272a] p-3 rounded-2xl flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><Icons.TrendDown /></div>
+                                                            <div>
+                                                                <div className="text-white text-sm font-bold">BTC/USD</div>
+                                                                <div className="text-[10px] text-gray-500">SELL · 1m</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-[#10a37f] font-bold text-sm">+$ 450.00</div>
+                                                    </div>
+                                                    <div className="bg-[#121214] border border-[#27272a] p-3 rounded-2xl flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><Icons.TrendDown /></div>
+                                                            <div>
+                                                                <div className="text-white text-sm font-bold">EUR/JPY OTC</div>
+                                                                <div className="text-[10px] text-gray-500">SELL · 5s</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-red-400 font-bold text-sm">-$ 45.00</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div className="anim-slide-up" style={{animationDelay: '0.1s'}}>
-                                            <div className="text-sm font-semibold text-white mb-3 flex justify-between items-center">
-                                                {t.recentSignals}
-                                                <span className="text-[10px] text-gray-500 font-normal border border-[#27272a] px-2 py-0.5 rounded-full">All time</span>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <div className="bg-[#121214] border border-[#27272a] p-3 rounded-2xl flex justify-between items-center">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]"><Icons.TrendUp size={16}/></div>
-                                                        <div>
-                                                            <div className="text-white text-sm font-bold">GBP/USD</div>
-                                                            <div className="text-[10px] text-gray-500">BUY · 15s</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-[#10a37f] font-bold text-sm">+$ 120.00</div>
-                                                </div>
-                                                <div className="bg-[#121214] border border-[#27272a] p-3 rounded-2xl flex justify-between items-center">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><Icons.TrendDown size={16}/></div>
-                                                        <div>
-                                                            <div className="text-white text-sm font-bold">BTC/USD</div>
-                                                            <div className="text-[10px] text-gray-500">SELL · 1m</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-[#10a37f] font-bold text-sm">+$ 450.00</div>
-                                                </div>
-                                                <div className="bg-[#121214] border border-[#27272a] p-3 rounded-2xl flex justify-between items-center">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><Icons.TrendDown size={16}/></div>
-                                                        <div>
-                                                            <div className="text-white text-sm font-bold">EUR/JPY OTC</div>
-                                                            <div className="text-[10px] text-gray-500">SELL · 5s</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-red-400 font-bold text-sm">-$ 45.00</div>
-                                                </div>
-                                            </div>
+                                            <button onClick={() => setActiveTab('chat')} className="w-full py-4 bg-white text-black rounded-2xl font-bold text-sm mt-2 flex items-center justify-center gap-2 hover:bg-gray-200 transition-all active:scale-[0.98] anim-slide-up" style={{animationDelay: '0.2s'}}>
+                                                <Icons.Sparkles size={16} /> {t.toSignals}
+                                            </button>
                                         </div>
-                                        
-                                        <button onClick={() => setActiveTab('chat')} className="w-full py-4 bg-white text-black rounded-2xl font-bold text-sm mt-2 flex items-center justify-center gap-2 hover:bg-gray-200 transition-all active:scale-[0.98] anim-slide-up" style={{animationDelay: '0.2s'}}>
-                                            <Icons.Sparkles size={16} /> Перейти к AI сигналам
-                                        </button>
                                     </div>
                                 )}
 
-                                {/* --- ВКЛАДКА AI ЧАТ --- */}
+                                {/* CHAT TAB */}
                                 {activeTab === 'chat' && (
-                                    <div className="pb-4">
-                                        {chatScreen === 'generator' && (
-                                            <div className="flex flex-col gap-4 anim-fade">
+                                    <div className="flex-1 flex flex-col overflow-hidden">
+                                        <div className="flex-1 overflow-y-auto px-5 custom-scroll">
+                                            <div className="pt-2 pb-3">
                                                 <CanvasChart symbol={asset} isOtc={isOtcSelected} />
-
-                                                <div className="flex flex-col items-center text-center gap-2 anim-slide-up" style={{ animationDelay: '0.2s' }}>
-                                                    <div className="w-[72px] h-[72px] rounded-[22px] flex items-center justify-center text-3xl border transition-colors duration-500 shadow-lg" style={{ backgroundColor: `${aiModel.hex}15`, borderColor: `${aiModel.hex}40` }}>
-                                                        {aiModel.icon}
-                                                    </div>
-                                                    <div>
-                                                        <h1 className="text-[22px] mb-1 text-white tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>{aiModel.name}</h1>
-                                                        <p className="text-[11px] text-gray-400 max-w-[260px] leading-relaxed mx-auto">
-                                                            Set the instrument, market and expiration — then tap send to get a signal.
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="w-full flex flex-col gap-3 anim-slide-up" style={{ animationDelay: '0.3s' }}>
-                                                    <div className="flex gap-2">
-                                                        <CustomSelect value={asset} options={ALL_ASSETS} onChange={setAsset} icon={<span className="text-base">🇪🇺</span>} openUp={false} />
-                                                        <div className="w-[85px]"><CustomSelect value={market} options={['OTC', 'Real']} onChange={setMarket} openUp={false} /></div>
-                                                        <div className="w-[70px]"><CustomSelect value={timeframe} options={TIMEFRAMES} onChange={setTimeframe} align="right" openUp={false} /></div>
-                                                    </div>
-
-                                                    <div className="bg-[#121214] border border-[#27272a] rounded-[24px] p-4 text-[13px] text-gray-300 relative min-h-[90px] shadow-inner group focus-within:ring-1 focus-within:ring-white/10 transition-all">
-                                                        <span className="opacity-90">{asset} {market}, expiration time {timeframe} — analyze the chart.</span>
-                                                        
-                                                        <button 
-                                                            onClick={generateSignal} 
-                                                            disabled={isAnalyzing || cooldown > 0} 
-                                                            className={`absolute bottom-3 right-3 w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${
-                                                                cooldown > 0 ? 'bg-[#27272a] text-gray-500 cursor-not-allowed' : 
-                                                                isAnalyzing ? 'cursor-not-allowed opacity-50' : 
-                                                                'hover:scale-105 active:scale-95 cursor-pointer'
-                                                            }`} 
-                                                            style={{ 
-                                                                backgroundColor: cooldown > 0 ? '' : `${aiModel.hex}20`, 
-                                                                color: cooldown > 0 ? '' : aiModel.hex 
-                                                            }}
-                                                        >
-                                                            {isAnalyzing ? (
-                                                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                                            ) : cooldown > 0 ? (
-                                                                <span className="text-[11px] font-bold">{cooldown}s</span>
-                                                            ) : (
-                                                                <Icons.Send />
-                                                            )}
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="w-full">
-                                                        <CustomSelect 
-                                                            value={aiModel.name} 
-                                                            options={AI_MODELS.map(m => m.name)} 
-                                                            onChange={(val) => setAiModel(AI_MODELS.find(m => m.name === val))} 
-                                                            icon={<div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-black font-bold" style={{ backgroundColor: aiModel.hex }}>{aiModel.name[0]}</div>} 
-                                                            openUp={true} 
-                                                        />
-                                                    </div>
-                                                </div>
                                             </div>
-                                        )}
 
-                                        {chatScreen === 'result' && signal && (
-                                            <div className="flex flex-col h-full anim-fade">
-                                                <div className="flex items-center gap-2 mb-4 text-[13px] text-gray-300 anim-slide-down">
-                                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-[pulseGlow_2s_infinite]" />
-                                                    {t.analysisComplete} {signal.direction}.
+                                            {messages.length === 0 && (
+                                                <div className="flex flex-col items-center text-center gap-1 py-2 anim-slide-up">
+                                                    <div className="w-[64px] h-[64px] rounded-[20px] flex items-center justify-center border shadow-lg transition-colors duration-500" style={{ backgroundColor: `${aiModel.hex}15`, borderColor: `${aiModel.hex}40` }}>
+                                                        <CurrentModelIcon size={28} color={aiModel.hex} />
+                                                    </div>
+                                                    <h2 className="text-lg text-white mt-2 tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>{aiModel.name}</h2>
+                                                    <p className="text-[11px] text-gray-400 max-w-[260px] leading-relaxed">{t.chatHint}</p>
                                                 </div>
+                                            )}
 
-                                                <div className={`w-full rounded-[28px] p-5 border-2 relative overflow-hidden anim-pop ${signal.direction === 'SELL' ? 'border-red-500/30 bg-gradient-to-b from-red-500/10 to-[#09090b]' : 'border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[#09090b]'}`}>
-                                                    <div className="flex justify-between items-center mb-5">
-                                                        <div className={`text-[22px] font-bold flex items-center gap-2 ${signal.direction === 'SELL' ? 'text-red-400' : 'text-emerald-400'}`}>
-                                                            {signal.direction === 'SELL' ? <Icons.TrendDown /> : <Icons.TrendUp />} {signal.direction}
-                                                        </div>
-                                                        <div className="flex flex-col items-end">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">{t.confidence}</span>
-                                                                <div className={`text-xl font-bold ${signal.direction === 'SELL' ? 'text-red-400' : 'text-emerald-400'}`}>{signal.confidence}%</div>
-                                                            </div>
-                                                            <div className="w-24 h-1.5 bg-black/40 rounded-full mt-1.5 overflow-hidden">
-                                                                <div className={`h-full ${signal.direction === 'SELL' ? 'bg-red-400' : 'bg-emerald-400'}`} style={{width: `${signal.confidence}%`}}></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                            {messages.map(msg => (
+                                                <SignalMessage key={msg.id} msg={msg} now={now} t={t} />
+                                            ))}
 
-                                                    <div className="flex gap-2 mb-5">
-                                                        <span className="bg-black/30 px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center gap-1.5 border border-white/5"><span className="text-sm">🇪🇺</span> {asset}</span>
-                                                        <span className="bg-black/30 px-3 py-1.5 rounded-xl text-[11px] font-medium border border-white/5">{timeframe}</span>
-                                                    </div>
+                                            <div ref={chatEndRef} style={{height: 1}} />
+                                        </div>
 
-                                                    <div className="space-y-2.5 mb-6">
-                                                        <div className="bg-black/20 p-3.5 rounded-2xl border border-white/5 backdrop-blur-sm">
-                                                            <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 font-semibold">{t.marketStructure}</p>
-                                                            <p className="text-[13px] text-gray-200 leading-snug">{signal.structure}</p>
-                                                        </div>
-                                                        <div className="bg-black/20 p-3.5 rounded-2xl border border-white/5 backdrop-blur-sm">
-                                                            <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 font-semibold">{t.confirmation}</p>
-                                                            <p className="text-[13px] text-gray-200 leading-snug">{signal.confirmation}</p>
-                                                        </div>
-                                                    </div>
+                                        <div className="shrink-0 px-4 pt-2 pb-1 bg-[#09090b] border-t border-[#27272a]/60">
+                                            <div className="flex gap-2 mb-2">
+                                                <CustomSelect value={asset} options={ALL_ASSETS} onChange={setAsset} icon={<span className="text-base">🇪🇺</span>} openUp={true} />
+                                                <div className="w-[82px]"><CustomSelect value={market} options={['OTC', 'Real']} onChange={setMarket} openUp={true} /></div>
+                                                <div className="w-[68px]"><CustomSelect value={timeframe} options={TIMEFRAMES} onChange={setTimeframe} align="right" openUp={true} /></div>
+                                            </div>
 
-                                                    <div className="w-full bg-black/50 rounded-full h-1 mb-2 overflow-hidden">
-                                                        <div className={`h-full ${signal.direction === 'SELL' ? 'bg-red-500' : 'bg-emerald-500'} progress-bar`} style={{ width: `${(timeLeft / maxTime) * 100}%` }} />
-                                                    </div>
-                                                    <div className="flex justify-between text-[11px] text-gray-500 font-medium mb-5">
-                                                        <span>{t.until} 13:15</span>
-                                                        <span>{timeLeft}s {t.left}</span>
-                                                    </div>
+                                            <div className="flex gap-2 items-center">
+                                                <ModelMiniSelect model={aiModel} onChange={setAiModel} />
 
-                                                    <button onClick={resetToGenerator} className="w-full py-3.5 rounded-2xl border border-white/10 text-[13px] font-semibold text-gray-200 hover:bg-white/5 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group cursor-pointer">
-                                                        <span className="group-hover:rotate-180 transition-transform duration-500"><Icons.Refresh /></span> {t.getNewSignal}
+                                                <div className="flex-1 bg-[#121214] border border-[#27272a] rounded-[20px] py-1.5 pl-3 pr-1.5 flex items-center gap-2 min-w-0 focus-within:ring-1 focus-within:ring-white/10 transition-all">
+                                                    <span className="text-[11px] text-gray-400 truncate flex-1 select-none">
+                                                        {asset} · {timeframe}
+                                                    </span>
+                                                    <button
+                                                        onClick={requestSignal}
+                                                        disabled={isAnalyzing || cooldown > 0}
+                                                        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                                                            cooldown > 0 ? 'bg-[#27272a] text-gray-500 cursor-not-allowed' :
+                                                            isAnalyzing ? 'cursor-not-allowed opacity-50' :
+                                                            'hover:scale-105 active:scale-95 cursor-pointer'
+                                                        }`}
+                                                        style={{
+                                                            backgroundColor: cooldown > 0 ? '' : `${aiModel.hex}25`,
+                                                            color: cooldown > 0 ? '' : aiModel.hex
+                                                        }}
+                                                    >
+                                                        {isAnalyzing ? (
+                                                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                                        ) : cooldown > 0 ? (
+                                                            <span className="text-[10px] font-bold">{cooldown}</span>
+                                                        ) : (
+                                                            <Icons.Send />
+                                                        )}
                                                     </button>
                                                 </div>
-
-                                                <div className="mt-5 flex items-center gap-2 text-[11px] text-gray-500 font-medium">
-                                                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] text-black font-bold" style={{ backgroundColor: aiModel.hex }}>{aiModel.name[0]}</div> 
-                                                    {aiModel.name}
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    <div className="bg-[#121214] border border-[#27272a] rounded-2xl p-4 flex justify-between items-center text-[12px] text-gray-400">
-                                                        {t.waitSignal} · 00:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}
-                                                        <span className="opacity-50"><Icons.Lock /></span>
-                                                    </div>
-                                                </div>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
-                            {/* НИЖНЕЕ МЕНЮ (Фиксировано внизу с учетом Safe Area) */}
-                            <div className="shrink-0 bg-[#09090b]/95 backdrop-blur-xl border-t border-[#27272a] px-6 pt-3 safe-bottom flex justify-around items-center z-40">
+                            <div className="shrink-0 bg-[#09090b]/95 backdrop-blur-xl border-t border-[#27272a] px-6 pt-2.5 safe-bottom flex justify-around items-center z-40">
                                 <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1.5 pb-2 transition-all duration-300 cursor-pointer ${activeTab === 'home' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}>
                                     <Icons.Home />
                                     <span className="text-[10px] font-bold tracking-widest">{t.home}</span>
@@ -704,15 +976,25 @@
                         </>
                     )}
 
-                    {/* ЛОАДЕР (Поверх всего) */}
+                    {/* Verify modal — поверх всего */}
+                    <VerifyModal
+                        open={verifyOpen}
+                        onClose={() => setVerifyOpen(false)}
+                        onSuccess={generateSignal}
+                        t={t}
+                        aiModel={aiModel}
+                    />
+
+                    {/* Analyzing overlay */}
                     {isAnalyzing && (
-                        <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-[150] flex flex-col items-center justify-center anim-fade">
+                        <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-[250] flex flex-col items-center justify-center anim-fade">
                             <div className="relative w-20 h-20 mb-6">
                                 <div className="absolute inset-0 border-2 border-white/10 rounded-full"></div>
                                 <div className="absolute inset-0 border-2 border-transparent rounded-full animate-spin" style={{ borderTopColor: aiModel.hex, borderRightColor: aiModel.hex }}></div>
-                                <div className="absolute inset-0 flex items-center justify-center text-3xl animate-pulse">{aiModel.icon}</div>
+                                <div className="absolute inset-0 flex items-center justify-center animate-pulse">
+                                    <CurrentModelIcon size={32} color={aiModel.hex} />
+                                </div>
                             </div>
-                            
                             <div className="w-48 h-1.5 bg-[#27272a] rounded-full mt-4 overflow-hidden">
                                 <div className="h-full transition-all duration-75 ease-linear" style={{ width: `${analysisProgress}%`, backgroundColor: aiModel.hex }}></div>
                             </div>
