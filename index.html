@@ -298,7 +298,7 @@
         const OTC_PAIRS = FOREX_PAIRS.map(p => `${p} OTC`);
         const CRYPTO_PAIRS = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'XRP/USD'];
         const ALL_ASSETS = [...FOREX_PAIRS, ...CRYPTO_PAIRS, ...OTC_PAIRS];
-        const TIMEFRAMES = ['5s', '15s', '30s', '1m', '5m'];
+        const TIMEFRAMES = ['5s', '10s', '15s', '30s', '1m', '5m'];
         const getSeconds = (tf) => tf.includes('m') ? parseInt(tf) * 60 : parseInt(tf);
 
         const VerifyModal = ({ open, onClose, onSuccess, t, aiModel }) => {
